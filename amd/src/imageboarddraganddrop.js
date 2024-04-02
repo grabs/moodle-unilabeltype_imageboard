@@ -31,9 +31,9 @@ export const init = () => {
     function registerDnDListener() {
         setTimeout(function() {
             canvas = document.getElementById("unilabel-imageboard-background-area");
-            canvas.addEventListener("mousedown", dragStart, false);
-            canvas.addEventListener("mousemove", drag, false);
-            canvas.addEventListener("mouseup", dragEnd, false);
+            canvas.addEventListener("dragstart", dragStart, false);
+            canvas.addEventListener("drag", drag, false);
+            canvas.addEventListener("dragend", dragEnd, false);
         }, 1000);
     }
 
@@ -42,9 +42,8 @@ export const init = () => {
      * @param {event} event
      */
     function dragStart(event) {
-        // console.log("dragStart");
+        console.log("xxx_dragStart", event);
         if (event && event.target && event.target.classList.contains('image')) {
-            event.preventDefault();
             // Image was selected so we have to store the information about this image.
             // ToDo: height auto needs different code
             selectedImage.number = event.target.getAttribute('id').split('unilabel-imageboard-imageid_')[1];
@@ -62,10 +61,12 @@ export const init = () => {
      */
     function drag(event) {
         if (selectedImage.number !== null && event.target.classList.contains('image')) {
+            selectedImage.width = event.target.style.width.split('px')[0];
+            selectedImage.height = event.target.style.height.split('px')[0];
             var xposition = calculateXposition(event);
             var yposition = calculateYposition(event);
-            selectedImage.itemToMove.style.left = xposition + "px";
-            selectedImage.itemToMove.style.top = yposition + "px";
+            ////selectedImage.itemToMove.style.left = xposition + "px";
+            ////selectedImage.itemToMove.style.top = yposition + "px";
             // Change the inputfield
             const inputPositionX = document.getElementById('id_unilabeltype_imageboard_xposition_' + (selectedImage.number));
             const inputPositionY = document.getElementById('id_unilabeltype_imageboard_yposition_' + (selectedImage.number));
@@ -79,6 +80,8 @@ export const init = () => {
      * @param {event} event
      */
     function dragEnd(event) {
+        console.log("xxx_dragEnd", event);
+        console.log("selectedImage.number", selectedImage.number);
         if (selectedImage.number !== null ) {
             var xposition = calculateXposition(event);
             var yposition = calculateYposition(event);

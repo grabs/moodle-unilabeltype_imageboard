@@ -9,12 +9,12 @@
 //import {eventTypes} from 'core_form/events';
 
 export const init = () => {
+    registerAllEventlistener();
     // Timeout notwendig, damit das Bild in der Draftarea "vorhanden" ist.
     // document.querySelector('#id_unilabeltype_imageboard_backgroundimage_fieldset .filemanager-container .realpreview');
-    setTimeout(refreshBackgroundImage, 2000);
-    setTimeout(registerAllEventlistener, 2500);
+    setTimeout(refreshBackgroundImage, 1000);
     // To show all images on pageload.
-    setTimeout(refreshAllImages, 2500);
+    setTimeout(refreshAllImages, 1000);
 
     setTimeout(function() {
      //   grid(600, 400);
@@ -250,7 +250,7 @@ export const init = () => {
             " style='position: relative;'>Überschrift" +
             "</div>" +
             "<div id='imageidimage_" + number + "'>" +
-            "<img class='image' src='' id='unilabel-imageboard-imageid_" +
+            "<img draggable='true' class='image' src='' id='unilabel-imageboard-imageid_" +
             number + "' style='position: relative; background-color: #f00;'>" +
             "</div>" +
             "</div>";
