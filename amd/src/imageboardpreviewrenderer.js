@@ -5,6 +5,8 @@
  * @copyright   Andreas Schenkel {@link https://github.com/andreasschenkel}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+//import log from 'core/log';
+//import {eventTypes} from 'core_form/events';
 
 export const init = () => {
     // Timeout notwendig, damit das Bild in der Draftarea "vorhanden" ist.
@@ -14,72 +16,54 @@ export const init = () => {
     // To show all images on pageload.
     setTimeout(refreshAllImages, 2500);
 
+    setTimeout(function() {
+     //   grid(600, 400);
+    }, 500);
+
     /**
      *
      * @param {event} event
      */
-    function oneListenerForAllInputFocusout(event) {
-        console.log("oneListenerForAllInputFocusout", event);
-        // The following events will be recognized and depending on the type we do the jobs.
-        // 1. event: focusout (xpositioninput, yositioninput, title, ...)
-        // 2. event: click (add element button)
-        console.log("event.target", event.target);
-
-        var dummyAttribute = event.target.getAttribute('id');
-        var titleInput = dummyAttribute.split('id_unilabeltype_imageboard_title_')[1];
-        if (titleInput) {
-            console.log("titleInput", titleInput);
-            // Target ist inputfeld xposition so we have tu update the image
-            refreshImage(titleInput);
-            return;
+    function focusoutExecute(event) {
+        var number = getNumberFromEvent(event);
+        if (number >= 0) {
+            refreshImage(number);
         }
+    }
 
-        var xPositionInput = dummyAttribute.split('id_unilabeltype_imageboard_xposition_')[1];
-        console.log("xPositionInput", xPositionInput);
-        if (xPositionInput) {
-            // Target ist inputfeld xposition so we have tu update the image
-            refreshImage(xPositionInput);
-            return;
+    /**
+     *
+     * @param {event} event
+     * @returns {*}
+     */
+    function getNumberFromEvent(event) {
+        // If there is a focusout event from one of the following input fields then evaluate
+        // the number of the element that was changed.
+        let imageidselectors = [
+            'id_unilabeltype_imageboard_title_',
+            'id_unilabeltype_imageboard_xposition_',
+            'id_unilabeltype_imageboard_yposition_',
+            'id_unilabeltype_imageboard_targetwidth_',
+            'id_unilabeltype_imageboard_targetheight_',
+            'id_unilabeltype_imageboard_border_',
+        ];
+        const eventid = event.target.getAttribute('id');
+        for (let i = 0; i < imageidselectors.length; i++) {
+            if (eventid.includes(imageidselectors[i])) {
+                return eventid.split(imageidselectors[i])[1];
+            }
         }
-
-        var yPositionInput = dummyAttribute.split('id_unilabeltype_imageboard_yposition_')[1];
-        console.log("yPositionInput", yPositionInput);
-        if (yPositionInput) {
-            // Target ist inputfeld yposition so we have tu update the image
-            refreshImage(yPositionInput);
-            return;
-        }
-
-        var targetwidth = dummyAttribute.split('id_unilabeltype_imageboard_targetwidth_')[1];
-        console.log("targetwidth", targetwidth);
-        if (targetwidth) {
-            refreshImage(targetwidth);
-            return;
-        }
-
-        var targetheight = dummyAttribute.split('id_unilabeltype_imageboard_targetheight_')[1];
-        console.log("targetheight", targetheight);
-        if (targetheight) {
-            refreshImage(targetheight);
-            return;
-        }
-
-        var border = dummyAttribute.split('id_unilabeltype_imageboard_border_')[1];
-        console.log("border", border);
-        if (border) {
-            refreshImage(border);
-            return;
-        }
-        console.log('');
+        // If focus out was NOT from one of our inputfield then return a number less than zero.
+        return -1;
     }
 
     /**
      *
      * @param {event} event
      */
-    function oneListenerForAllInputClick(event) {
-        var dummyAttribute = event.target.getAttribute('id');
-        var mform = dummyAttribute.split('button-mform1')[1];
+    function onclickExecute(event) {
+        var targetid = event.target.getAttribute('id');
+        var mform = targetid.split('button-mform1')[1];
         if (mform) {
             setTimeout(function() {
                 // An element was added so we have to add a div for the image to the dom.
@@ -91,6 +75,35 @@ export const init = () => {
     }
 
     /**
+     *
+     * @param {number} canvaswidth
+     * @param {number} canvasheight
+     */
+  /*  function grid(canvaswidth, canvasheight) {
+        // Create a 50x50px helpergrid if $capababilityforgrid.
+        let helpergrids = {};
+        for (let y = 0; y < canvasheight; y = y + 50) {
+            for (let x = 0; x < canvaswidth; x = x + 50) {
+                helpergrid = [];
+                helpergrid['x'] = x;
+                helpergrid['y'] = y;
+                helpergrids = helpergrid;
+            }
+        }
+    }*/
+
+    /**
+     *
+     * @param {event} event
+     */
+    /*
+    function machwas(event) {
+        log.debug("Bild hochgeladen");
+        log.debug(event);
+    }
+    */
+
+    /**
      * Register eventlistener to the all input fields of the form to register
      * focus-out events from input fields in order to trigger a fresh of the preview.
      */
@@ -98,12 +111,18 @@ export const init = () => {
         var mform = document.querySelectorAll('[id^="mform"]')[0];
         // We register one listener per eventtype to the mform and use the bubble-event-feature to check out
         // the target of an event.
-        // All focusout events will be handeled by oneListenerForAllInputFocusout.
-        mform.addEventListener("focusout", oneListenerForAllInputFocusout, false);
-        // All click events will be handeled by oneListenerForAllInputClick.
-        mform.addEventListener("click", oneListenerForAllInputClick, false);
+
+        // All focusout-events will be handeled by oneListenerForAllInputFocusout.
+        mform.addEventListener("focusout", focusoutExecute, false);
+
+        // All click-events will be handeled by oneListenerForAllInputClick.
+        mform.addEventListener("click", onclickExecute, false);
+
+        // All uploadCompleted-events
+        //// mform.addEventListener(eventTypes.uploadCompleted, machwas, false);
 
         // First: When uploading a backgroundimage the backgroundimage of the backgroundimagediv must be updated.
+        // ToDo: better use eventlistener
         let backgroundfileNode = document.getElementById('id_unilabeltype_imageboard_backgroundimage_fieldset');
         if (backgroundfileNode) {
             let observer = new MutationObserver(refreshBackgroundImage);
@@ -232,7 +251,7 @@ export const init = () => {
             "</div>" +
             "<div id='imageidimage_" + number + "'>" +
             "<img class='image' src='' id='unilabel-imageboard-imageid_" +
-            number + "' style='position: relative; min-width: 100px; min-height: 100px; background-color: #f00;'>" +
+            number + "' style='position: relative; background-color: #f00;'>" +
             "</div>" +
             "</div>";
         return imagedivashtml;
