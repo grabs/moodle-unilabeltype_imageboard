@@ -215,11 +215,11 @@ export const init = () => {
      * @param {int} number
      */
     function addImageToDom(number) {
-        console.log("addImageToDom" + number);
+        //console.log("addImageToDom" + number);
         let backgroundArea = document.getElementById('unilabel-imageboard-background-area');
         const imageid = document.getElementById('unilabel-imageboard-imageid_' + number);
         if (imageid === null) {
-            console.log('div fehlt noch im dom ' + imageid);
+            //console.log('div fehlt noch im dom ' + imageid);
             // This div does not exist so we need do add it do dom.
             backgroundArea.innerHTML = backgroundArea.innerHTML + renderFromTemplate(number);
             // add an obverser to be aple to update if imge is uloaded
@@ -230,7 +230,7 @@ export const init = () => {
             }
             refreshImage(number);
         } else {
-            console.log('div existiert ' + number);
+            //console.log('div existiert ' + number);
             // Div already exists so we need only to refresh the image because we only uploaded a new image
             // to an already existing div.
             refreshImage(number);
@@ -329,7 +329,7 @@ export const init = () => {
      * @returns {*[]} Array with the collected information that are set in the form for the image.
      */
     function getAllImagedataFromForm(number) {
-        console.log("getAllImagedataFromForm number= " + number);
+        //console.log("getAllImagedataFromForm number= " + number);
         let imageids = {
             title: 'id_unilabeltype_imageboard_title_' + number,
             xposition: 'id_unilabeltype_imageboard_xposition_' + number,
@@ -341,7 +341,7 @@ export const init = () => {
         };
 
         let imagedata = [];
-        console.log("document.getElementById(imageids.title)", document.getElementById(imageids.title));
+        //console.log("document.getElementById(imageids.title)", document.getElementById(imageids.title));
         imagedata['title'] = document.getElementById(imageids.title).value;
         imagedata['xposition'] = document.getElementById(imageids.xposition).value;
         imagedata['yposition'] = document.getElementById(imageids.yposition).value;

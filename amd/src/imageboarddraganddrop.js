@@ -42,7 +42,6 @@ export const init = () => {
      * @param {event} event
      */
     function dragStart(event) {
-        console.log("xxx_dragStart", event);
         if (event && event.target && event.target.classList.contains('image')) {
             // Image was selected so we have to store the information about this image.
             // ToDo: height auto needs different code
@@ -52,6 +51,12 @@ export const init = () => {
             selectedImage.itemToMove = document.getElementById('unilabel_imageboard_imagediv_' + selectedImage.number);
             selectedImage.eventlayerX = event.layerX;
             selectedImage.eventlayerY = event.layerY;
+            // Clone the selected image and use it as dragimage.
+            let clonedImage = event.target.cloneNode(false);
+            clonedImage.setAttribute('id', 'iamdragged');
+            setTimeout(function() {
+                event.dataTransfer.setDragImage(clonedImage, event.layerX, event.layerY);
+            }, 0);
         }
     }
 
@@ -60,19 +65,9 @@ export const init = () => {
      * @param {event} event
      */
     function drag(event) {
-        if (selectedImage.number !== null && event.target.classList.contains('image')) {
-            selectedImage.width = event.target.style.width.split('px')[0];
-            selectedImage.height = event.target.style.height.split('px')[0];
-            var xposition = calculateXposition(event);
-            var yposition = calculateYposition(event);
-            ////selectedImage.itemToMove.style.left = xposition + "px";
-            ////selectedImage.itemToMove.style.top = yposition + "px";
-            // Change the inputfield
-            const inputPositionX = document.getElementById('id_unilabeltype_imageboard_xposition_' + (selectedImage.number));
-            const inputPositionY = document.getElementById('id_unilabeltype_imageboard_yposition_' + (selectedImage.number));
-            inputPositionX.value = xposition;
-            inputPositionY.value = yposition;
-        }
+        console.log("drag", event);
+        // Maybe we can do something during dragging but at the moment I do not have access to the upper left
+        // corner of the dragged image.
     }
 
     /**
@@ -80,8 +75,6 @@ export const init = () => {
      * @param {event} event
      */
     function dragEnd(event) {
-        console.log("xxx_dragEnd", event);
-        console.log("selectedImage.number", selectedImage.number);
         if (selectedImage.number !== null ) {
             var xposition = calculateXposition(event);
             var yposition = calculateYposition(event);
