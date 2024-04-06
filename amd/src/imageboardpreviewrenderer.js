@@ -271,7 +271,7 @@ export const init = () => {
             let imageid = document.getElementById('unilabel-imageboard-imageid_' + number);
             // Werte für das image setzen
             let imagedata = getAllImagedataFromForm(number);
-            imageid.style.background = 'blue';
+            imageid.style.background = imagedata['titlebackgroundcolor'];
             imageid.src = imagedata['src'];
             const imagediv = document.getElementById('unilabel_imageboard_imagediv_' + number);
             imagediv.style.left = parseInt(imagedata['xposition']) + "px";
@@ -293,16 +293,9 @@ export const init = () => {
             } else {
                 imageid.title = '';
             }
-            let colourpicker = document.getElementById('id_unilabeltype_imageboard_titlebackgroundcolor_colourpicker');
-            let color = '';
-            if (colourpicker.value == '') {
-                color = '#000000';
-            } else {
-                color = colourpicker.value;
-            }
             if (imagedata['border'] != 0) {
                 imageid.style.border = imagedata['border'] + "px solid";
-                imageid.style.borderColor = color;
+                imageid.style.borderColor = imagedata['titlebackgroundcolor'];
             } else {
                 imageid.style.border = "0";
             }
@@ -311,6 +304,9 @@ export const init = () => {
             let title = imagedata['title'];
             const imageidtitle = document.getElementById('imageidtitle_' + number);
             imageidtitle.innerHTML = title;
+            imageidtitle.style.color = imagedata['titlecolor'];
+            imageidtitle.style.backgroundColor = imagedata['titlebackgroundcolor'];
+            imageidtitle.style.fontSize = imagedata['fontsize'] + "px";
         } else {
             //console.log("number ist ein array" , number);
             //console.log("number[0] ist ein array" , number[0]);
@@ -332,6 +328,9 @@ export const init = () => {
         //console.log("getAllImagedataFromForm number= " + number);
         let imageids = {
             title: 'id_unilabeltype_imageboard_title_' + number,
+            titlecolor: 'id_unilabeltype_imageboard_titlecolor_colourpicker',
+            titlebackgroundcolor: 'id_unilabeltype_imageboard_titlebackgroundcolor_colourpicker',
+            fontsize: 'id_unilabeltype_imageboard_fontsize',
             xposition: 'id_unilabeltype_imageboard_xposition_' + number,
             yposition: 'id_unilabeltype_imageboard_yposition_' + number,
             targetwidth: 'id_unilabeltype_imageboard_targetwidth_' + number,
@@ -343,6 +342,9 @@ export const init = () => {
         let imagedata = [];
         //console.log("document.getElementById(imageids.title)", document.getElementById(imageids.title));
         imagedata['title'] = document.getElementById(imageids.title).value;
+        imagedata['titlecolor'] = document.getElementById(imageids.titlecolor).value;
+        imagedata['titlebackgroundcolor'] = document.getElementById(imageids.titlebackgroundcolor).value;
+        imagedata['fontsize'] = document.getElementById(imageids.fontsize).value;
         imagedata['xposition'] = document.getElementById(imageids.xposition).value;
         imagedata['yposition'] = document.getElementById(imageids.yposition).value;
         imagedata['targetwidth'] = document.getElementById(imageids.targetwidth).value;

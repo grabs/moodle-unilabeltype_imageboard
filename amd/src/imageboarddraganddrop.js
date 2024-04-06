@@ -65,7 +65,7 @@ export const init = () => {
             document.body.appendChild(div);
 
             img.src = selectedImage.src;
-            img.style.border = "0px solid #ff0000";
+            img.style.border = "10px solid #ff0000";
             img.width = selectedImage.width;
             img.height = selectedImage.height;
 
@@ -91,7 +91,9 @@ export const init = () => {
         console.log("dragEnd", event);
         if (selectedImage.number !== null ) {
             var xposition = calculateXposition(event);
+            console.log("xposition", xposition);
             var yposition = calculateYposition(event);
+            console.log("yposition", yposition);
             selectedImage.itemToMove.style.left = xposition + "px";
             selectedImage.itemToMove.style.top = yposition + "px";
             // Change the inputfield
