@@ -246,7 +246,7 @@ export const init = () => {
     function renderFromTemplate(number) {
         const imagedivashtml =
             "<div id='unilabel_imageboard_imagediv_" + number + "' style='z-index: 5; position: absolute;'>" +
-            "<div id='imageidtitle_" + number + "' class='unilabel-imageboard-title rounded' " +
+            "<div id='imageidtitle_" + number + "' class='unilabel-imageboard-title' " +
             " style='position: relative;'>Überschrift" +
             "</div>" +
             "<div id='imageidimage_" + number + "'>" +

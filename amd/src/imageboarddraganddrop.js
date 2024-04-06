@@ -10,6 +10,7 @@ export const init = () => {
     // Store some data about the selected image that is moved.
     var selectedImage = [];
     selectedImage.number = null;
+    selectedImage.src = '';
     // ItemToMove is the div that the selected image is inside. We do NOT move the image we move the div.
     selectedImage.itemToMove = null;
     // ToDo: Add documentation about xoffset?
@@ -22,8 +23,8 @@ export const init = () => {
     var canvas = null;
     var canvaswidth = 950;
     var canvasheight = 400;
-
     registerDnDListener();
+    var img = new Image();
 
     /**
      *
@@ -38,34 +39,46 @@ export const init = () => {
     }
 
     /**
-     *
+     * ToDo: height auto needs different code
      * @param {event} event
      */
     function dragStart(event) {
+        console.log("dragStart", event);
         if (event && event.target && event.target.classList.contains('image')) {
             // Image was selected so we have to store the information about this image.
-            // ToDo: height auto needs different code
+            selectedImage.src = event.target.src;
             selectedImage.number = event.target.getAttribute('id').split('unilabel-imageboard-imageid_')[1];
             selectedImage.width = event.target.style.width.split('px')[0];
             selectedImage.height = event.target.style.height.split('px')[0];
             selectedImage.itemToMove = document.getElementById('unilabel_imageboard_imagediv_' + selectedImage.number);
             selectedImage.eventlayerX = event.layerX;
             selectedImage.eventlayerY = event.layerY;
-            // Clone the selected image and use it as dragimage.
-            let clonedImage = event.target.cloneNode(false);
-            clonedImage.setAttribute('id', 'iamdragged');
-            setTimeout(function() {
-                event.dataTransfer.setDragImage(clonedImage, event.layerX, event.layerY);
-            }, 0);
+
+            console.log('selectedImage', selectedImage);
+
+            // Now we create a div and place the image that has to be moved in order to add it to he event
+            // by using event.dataTransfer.setDragImage
+            var div = document.createElement("div");
+            div.id = "iamdragged";
+            div.style.width = selectedImage.width + "px";
+            div.style.height = selectedImage.height + "px";
+            document.body.appendChild(div);
+
+            img.src = selectedImage.src;
+            img.style.border = "0px solid #ff0000";
+            img.width = selectedImage.width;
+            img.height = selectedImage.height;
+
+            document.getElementById('iamdragged').appendChild(img);
+            event.dataTransfer.setDragImage(div, event.layerX + 0, event.layerY + 0);
         }
     }
 
     /**
      *
-     * @param {event} event
      */
-    function drag(event) {
-        console.log("drag", event);
+    function drag() {
+        // console.log("drag", event);
         // Maybe we can do something during dragging but at the moment I do not have access to the upper left
         // corner of the dragged image.
     }
@@ -75,6 +88,7 @@ export const init = () => {
      * @param {event} event
      */
     function dragEnd(event) {
+        console.log("dragEnd", event);
         if (selectedImage.number !== null ) {
             var xposition = calculateXposition(event);
             var yposition = calculateYposition(event);
@@ -87,6 +101,7 @@ export const init = () => {
             inputPositionY.value = yposition;
             // Reset saved image data
             selectedImage.number = null;
+            document.getElementById('iamdragged').remove();
         }
     }
 
