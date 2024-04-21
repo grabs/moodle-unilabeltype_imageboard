@@ -155,7 +155,7 @@ export const init = () => {
         // previewimage vom filemanager id_unilabeltype_imageboard_backgroundimage_fieldset erhalten
         let filemanagerbackgroundimagefieldset = document.getElementById('id_unilabeltype_imageboard_backgroundimage_fieldset');
         let previewimage = filemanagerbackgroundimagefieldset.getElementsByClassName('realpreview');
-        let backgrounddiv = document.getElementById('unilabel-imageboard-background-area');
+        let backgrounddiv = document.getElementById('unilabel-imageboard-background-canvas');
         if (previewimage.length > 0) {
             let backgroundurl = previewimage[0].getAttribute('src').split('?')[0];
             // If the uploaded file reuses the filename of a previously uploaded image, they differ
@@ -228,40 +228,23 @@ export const init = () => {
      * @param {int} number
      */
     function addImageToDom(number) {
-        console.log("addImageToDom" + number);
-        //let backgroundArea = document.getElementById('unilabel-imageboard-background-area');
-       // let container = document.getElementById('container');
-
         const imageid = document.getElementById('unilabel-imageboard-imageid-' + number);
         if (imageid === null) {
             console.log("imageid ist null");
             renderAddedImage(number);
-            console.log("renderAddedImage fertig");
-            //console.log('div fehlt noch im dom ' + imageid);
             // This div does not exist so we need do add it do dom.
-            //renderFromTemplate(number);
- //backgroundArea.innerHTML = backgroundArea.innerHTML + renderFromTemplate(number);
-            //container.innerHTML = container.innerHTML + renderFromTemplate(number);
-
-
-            // add an obverser to be aple to update if imge is uloaded
+            // Add an obverser to be able to update if image is uploaded.
             let imagefileNode = document.getElementById('fitem_id_unilabeltype_imageboard_image_' + (number));
-            console.log("renderAddedImage fertig");
             if (imagefileNode) {
                 let observer = new MutationObserver(refreshImage);
                 observer.observe(imagefileNode, {attributes: true, childList: true, subtree: true});
             }
-            console.log("before refreshImage number");
-            ////refreshImage(number);
-            console.log("after refreshImage number");
         } else {
-            //console.log('div existiert ' + number);
             // Div already exists so we need only to refresh the image because we only uploaded a new image
             // to an already existing div.
             refreshImage(number);
         }
     }
-
 
     /**
      *
@@ -272,50 +255,19 @@ export const init = () => {
         const context = {
             // Data to be rendered
             number: number,
-            title: "hurzenschnurz"
+            title: "title"
         };
-        //let backgroundArea = document.getElementById('unilabel-imageboard-background-area');
-        //backgroundArea.innerHTML = backgroundArea.innerHTML + renderFromTemplate(number);
 
         Templates.renderForPromise('unilabeltype_imageboard/previewelement', context).then(({html, js}) => {
             // We have to get the actual content, combine it with the rendered image and replace then the actual content.
             let imageboardcontainer = document.getElementById('imageboardcontainer').innerHTML;
-            console.log("imagehtml", html);
-            console.log('imageboardcontainer', imageboardcontainer);
-            //let combiniert = containerinnerhtml + html + "x";
-            let combiniert = "<div>" + imageboardcontainer + "</div>" + html;
-            console.log("imagehtmlcombiniert", combiniert);
-            Templates.replaceNodeContents('#imageboardcontainer', combiniert, js);
-            console.log("replaceNodeContents fertig");
+            let combined = "<div>" + imageboardcontainer + "</div>" + html;
+            Templates.replaceNodeContents('#imageboardcontainer', combined, js);
             //return null;
         }).catch(() => {
             // No tiny editor present
         });
     }
-
-
-
-
-    /**
-     * Renders the div for the image in preview.
-     *
-     * @param {int} number
-     * @returns {string}
-     */
- /*  function renderFromTemplate(number) {
-        const imagedivashtml =
-            "<div id='unilabel-imageboard-element-" + number + "' style='z-index: 5; position: absolute;'>" +
-            "<div id='id_elementtitle-" + number + "' class='unilabel-imageboard-title' " +
-            " style='position: relative; height: 50px;'>Überschrift" +
-            "</div>" +
-            "<div id='imageidimage-" + number + "'>" +
-            "<img draggable='true' class='image' src='' id='unilabel-imageboard-imageid-" +
-            number + "' style='position: relative; background-color: #f00;'>" +
-            "</div>" +
-            "</div>";
-        return imagedivashtml;
-    }
-*/
 
     /**
      * If an image was uploaded or inputfields in the form changed then we need to refresh
