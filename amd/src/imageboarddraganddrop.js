@@ -20,11 +20,13 @@ export const init = () => {
     selectedImage.eventlayerY = 0;
     selectedImage.width = null;
     selectedImage.height = null;
+    selectedImage.titlecorrector = 0;
 
     // Store the data about the canvas/background.
     var canvas = null;
     var canvaswidth = 950;
     var canvasheight = 400;
+
     registerDnDListener();
 
     /**
@@ -34,7 +36,6 @@ export const init = () => {
         setTimeout(function() {
             canvas = document.getElementById("unilabel-imageboard-background-canvas");
             canvas.addEventListener("dragstart", dragStart, false);
-            canvas.addEventListener("drag", drag, false);
             canvas.addEventListener("dragend", dragEnd, false);
         }, 1000);
     }
@@ -44,7 +45,15 @@ export const init = () => {
      * @param {event} event
      */
     function dragStart(event) {
-        console.log("dragStart event", event);
+        // Check if title or image is selected,
+        if (event.explicitOriginalTarget && event.explicitOriginalTarget.classList) {
+            console.log("dragStart image ausgewählt");
+            selectedImage.titlecorrector = 0;
+        } else {
+            console.log("dragStart title ausgewählt");
+            selectedImage.titlecorrector = 50;
+        }
+
         if (event && event.target && event.target.classList.contains('unilabel-imageboard-element-draggable')) {
             // Image was selected, so we have to store the information about this image.
             // 1. Get the number of the selected element.
@@ -71,31 +80,22 @@ export const init = () => {
      *
      * @param {event} event
      */
-    function drag(event) {
-        console.log("drag event.offsetX", event.offsetX);
-        console.log("drag selectedImage.itemToMove.style.left", selectedImage.itemToMove.style.left);
-        console.log("event.target", event.target);
-        console.log("-- event.target.style", event.target.style);
-        // var xposition = calculateXposition(event);
-       // console.log("xposition", xposition);
-       // var yposition = calculateYposition(event);
-       // console.log("yposition", yposition);
-    }
-
-    /**
-     *
-     * @param {event} event
-     */
     function dragEnd(event) {
-        console.log("dragEnd", event);
-        console.log("drag event.offsetX", event.offsetX);
+        console.log("dragEnd event", event);
+        console.log("dragEnd event.target", event.target);
+        console.log("dragEnd event.offsetX", event.offsetX);
+        console.log("");
+        console.log("");
+
         if (selectedImage.number !== null ) {
             var xposition = calculateXposition(event);
             console.log("xposition", xposition);
             var yposition = calculateYposition(event);
             console.log("yposition", yposition);
             selectedImage.itemToMove.style.left = xposition + "px";
-            selectedImage.itemToMove.style.top = yposition + "px";
+            selectedImage.itemToMove.style.top = yposition + selectedImage.titlecorrector + "px";
+            console.log("qqqqqqqqqqqqq", selectedImage.itemToMove.style.top);
+
             // Change the inputfield
             const inputPositionX = document.getElementById('id_unilabeltype_imageboard_xposition_' + (selectedImage.number));
             const inputPositionY = document.getElementById('id_unilabeltype_imageboard_yposition_' + (selectedImage.number));
@@ -103,6 +103,7 @@ export const init = () => {
             inputPositionY.value = yposition;
             // Reset saved image data
             selectedImage.number = null;
+            selectedImage.titlecorrector = 0;
         }
     }
 
