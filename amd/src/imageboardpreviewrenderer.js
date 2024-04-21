@@ -198,7 +198,6 @@ export const init = () => {
      * We need a timeout
      */
     function refreshAllImages() {
-        console.log("refreshAllImages");
         const singleElements = document.querySelectorAll('[id^="fitem_id_unilabeltype_imageboard_image_"]');
         for (let i = 0; i < singleElements.length; i++) {
             // Todo: Skip removed elements that are still in the dom but hidden.
@@ -211,8 +210,6 @@ export const init = () => {
                 addImageToDom(number);
                 // ToDo: Do we need a timeout to wait until the dic was added so that refresh can work correctly?
                 // see also refreshImage ... there is already a timeout
-                console.log("214");
-
                 setTimeout(function() {
                     console.log("verzögerter refresh");
                     refreshImage(number);
