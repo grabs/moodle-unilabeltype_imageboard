@@ -28,7 +28,13 @@
 }
 
 .unilabel-imageboard-title,
-.unilabel-imageboard-imageid {
+.unilabel-imageboard-image {
     cursor: move;
     z-index: 10;
+}
+.unilabel-imageboard-title {
+    border-radius: 10px;
+}
+.unilabel-imageboard-image {
+    border-radius: 10px;
 }
