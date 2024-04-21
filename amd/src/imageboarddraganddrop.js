@@ -5,13 +5,15 @@
  * @copyright   Andreas Schenkel {@link https://github.com/andreasschenkel}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+//import Templates from 'core/templates';;
 
 export const init = () => {
     // Store some data about the selected image that is moved.
     var selectedImage = [];
     selectedImage.number = null;
+    selectedImage.number = null;
     selectedImage.src = '';
-    // ItemToMove is the div that the selected image is inside. We do NOT move the image we move the div.
+    // ItemToMove is the div that the selected image is inside AND the title. We do NOT move the image we move the itemtomove-div.
     selectedImage.itemToMove = null;
     // ToDo: Add documentation about xoffset?
     selectedImage.eventlayerX = 0;
@@ -24,7 +26,6 @@ export const init = () => {
     var canvaswidth = 950;
     var canvasheight = 400;
     registerDnDListener();
-    var img = new Image();
 
     /**
      *
@@ -43,36 +44,99 @@ export const init = () => {
      * @param {event} event
      */
     function dragStart(event) {
-        console.log("dragStart", event);
+        console.log("dragStart event", event);
         if (event && event.target && event.target.classList.contains('image')) {
-            // Image was selected so we have to store the information about this image.
-            selectedImage.src = event.target.src;
-            selectedImage.number = event.target.getAttribute('id').split('unilabel-imageboard-imageid_')[1];
-            selectedImage.width = event.target.style.width.split('px')[0];
-            selectedImage.height = event.target.style.height.split('px')[0];
-            selectedImage.itemToMove = document.getElementById('unilabel_imageboard_imagediv_' + selectedImage.number);
+            console.log("classlist contains image");
+            // Image was selected, so we have to store the information about this image.
+            // 1. Get the number of the selected element.
+            let number = event.target.getAttribute('id').split('unilabel-imageboard-element-')[1];
+            console.log("number", number);
+            // 2. Get imagedata of the selected element.
+            let imagedata = getAllImagedataFromForm(number);
+            console.log("imagedata", imagedata);
+            // 3. Set the number of the selected image so this image can be updated when dragEnds.
+            selectedImage.number = number;
+            // 4. Collect the other information.
+            selectedImage.title = imagedata['title'];
+            selectedImage.fontsize = imagedata['fontsize'];
+            selectedImage.width = imagedata['targetwidth'];
+            selectedImage.height = imagedata['targetheight'];
+
+            selectedImage.itemToMove = document.getElementById('unilabel-imageboard-element-' + selectedImage.number);
+
+            console.log("selectedImage.itemToMove", selectedImage.itemToMove);
+
             selectedImage.eventlayerX = event.layerX;
             selectedImage.eventlayerY = event.layerY;
 
-            console.log('selectedImage', selectedImage);
+            console.log('selectedImage....', selectedImage);
 
             // Now we create a div and place the image that has to be moved in order to add it to he event
             // by using event.dataTransfer.setDragImage
-            var div = document.createElement("div");
-            div.id = "iamdragged";
-            div.style.width = selectedImage.width + "px";
-            div.style.height = selectedImage.height + "px";
-            document.body.appendChild(div);
+            //var div = document.createElement("div");
+            ////div.textContent = imagedata['title'];
 
-            img.src = selectedImage.src;
-            img.style.border = "10px solid #ff0000";
-            img.width = selectedImage.width;
-            img.height = selectedImage.height;
+            ////div.style.backgroundColor = "rgba(255, 251, 188, 0.5)";
+            ////div.style.fontSize = selectedImage.fontsize + "px";
 
-            document.getElementById('iamdragged').appendChild(img);
-            event.dataTransfer.setDragImage(div, event.layerX + 0, event.layerY + 0);
+            //div.id = "iamdragged";
+            ////div.style.width = selectedImage.width + "px";
+            ////div.style.height = selectedImage.height + "px";
+
+            //document.body.appendChild(div);
+            //renderDatatransfereImage(number);
+            //event.dataTransfer.setDragImage(div, event.layerX + 0, event.layerY + 0);
         }
     }
+
+    /**
+     * Get all data from image that is stored in the form and collects them in one array.
+     *
+     * @param {int} number of the image
+     * @returns {*[]} Array with the collected information that are set in the form for the image.
+     */
+    function getAllImagedataFromForm(number) {
+        //console.log("getAllImagedataFromForm number= " + number);
+        let imageids = {
+            title: 'id_unilabeltype_imageboard_title_' + number,
+            titlecolor: 'id_unilabeltype_imageboard_titlecolor_colourpicker',
+            titlebackgroundcolor: 'id_unilabeltype_imageboard_titlebackgroundcolor_colourpicker',
+            fontsize: 'id_unilabeltype_imageboard_fontsize',
+            xposition: 'id_unilabeltype_imageboard_xposition_' + number,
+            yposition: 'id_unilabeltype_imageboard_yposition_' + number,
+            targetwidth: 'id_unilabeltype_imageboard_targetwidth_' + number,
+            targetheight: 'id_unilabeltype_imageboard_targetheight_' + number,
+            src: '',
+            border: 'id_unilabeltype_imageboard_border_' + number,
+        };
+
+        let imagedata = [];
+        //console.log("document.getElementById(imageids.title)", document.getElementById(imageids.title));
+        imagedata['title'] = document.getElementById(imageids.title).value;
+        imagedata['titlecolor'] = document.getElementById(imageids.titlecolor).value;
+        imagedata['titlebackgroundcolor'] = document.getElementById(imageids.titlebackgroundcolor).value;
+        imagedata['fontsize'] = document.getElementById(imageids.fontsize).value;
+        imagedata['xposition'] = document.getElementById(imageids.xposition).value;
+        imagedata['yposition'] = document.getElementById(imageids.yposition).value;
+        imagedata['targetwidth'] = document.getElementById(imageids.targetwidth).value;
+        imagedata['targetheight'] = document.getElementById(imageids.targetheight).value;
+
+        // Src der Draftfile ermitteln
+        const element = document.getElementById('id_unilabeltype_imageboard_image_' + number + '_fieldset');
+        const imagetag = element.getElementsByTagName('img');
+        let src = '';
+        if (imagetag.length && imagetag.length != 0) {
+            src = imagetag[0].src;
+            src = src.split('?')[0];
+        }
+        imagedata['src'] = src;
+        imagedata['border'] = document.getElementById(imageids.border).value;
+
+        return imagedata;
+    }
+
+
+
 
     /**
      *
@@ -106,6 +170,26 @@ export const init = () => {
             document.getElementById('iamdragged').remove();
         }
     }
+
+
+    /**
+     *
+     * @param {number} number
+     */
+    /*
+    function renderDatatransfereImage(number) {
+        const context = {
+            // Data to be rendered
+            number: number,
+            title: "datatransfer"
+        };
+        Templates.renderForPromise('unilabeltype_imageboard/datatransfereimage', context).then(({html, js}) => {
+            console.log(html);
+            Templates.replaceNodeContents('#iamdragged', html, js);
+        }).catch(() => {
+            // No tiny editor present
+        });
+    }*/
 
     /**
      *

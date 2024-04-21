@@ -7,6 +7,8 @@
  */
 //import log from 'core/log';
 //import {eventTypes} from 'core_form/events';
+////import Templates from "../../../../../../lib/amd/src/templates";
+import Templates from 'core/templates';
 
 export const init = () => {
     registerAllEventlistener();
@@ -25,9 +27,14 @@ export const init = () => {
      * @param {event} event
      */
     function focusoutExecute(event) {
+        console.log("focusoutExecute", event);
         var number = getNumberFromEvent(event);
         if (number >= 0) {
             refreshImage(number);
+        } else {
+            console.log("refreshAllImages");
+            // ToDo: only refresh if titlecolor, titlebackgroundcolor, titlesize was changed
+            refreshAllImages();
         }
     }
 
@@ -191,19 +198,25 @@ export const init = () => {
      * We need a timeout
      */
     function refreshAllImages() {
+        console.log("refreshAllImages");
         const singleElements = document.querySelectorAll('[id^="fitem_id_unilabeltype_imageboard_image_"]');
         for (let i = 0; i < singleElements.length; i++) {
             // Todo: Skip removed elements that are still in the dom but hidden.
             let singleElement = singleElements[i].getAttribute('id');
             let number = singleElement.split('fitem_id_unilabeltype_imageboard_image_')[1];
             // Check if there exists already a div for this image.
-            const imageid = document.getElementById('unilabel-imageboard-imageid_' + number);
+            const imageid = document.getElementById('unilabel-imageboard-imageid-' + number);
             if (imageid === null) {
                 // Div does not exist so we need do add it do dom.
                 addImageToDom(number);
                 // ToDo: Do we need a timeout to wait until the dic was added so that refresh can work correctly?
                 // see also refreshImage ... there is already a timeout
-                refreshImage(number);
+                console.log("214");
+
+                setTimeout(function() {
+                    console.log("verzögerter refresh");
+                    refreshImage(number);
+                }, 1000);
             } else {
                 refreshImage(number);
             }
@@ -215,20 +228,32 @@ export const init = () => {
      * @param {int} number
      */
     function addImageToDom(number) {
-        //console.log("addImageToDom" + number);
-        let backgroundArea = document.getElementById('unilabel-imageboard-background-area');
-        const imageid = document.getElementById('unilabel-imageboard-imageid_' + number);
+        console.log("addImageToDom" + number);
+        //let backgroundArea = document.getElementById('unilabel-imageboard-background-area');
+       // let container = document.getElementById('container');
+
+        const imageid = document.getElementById('unilabel-imageboard-imageid-' + number);
         if (imageid === null) {
+            console.log("imageid ist null");
+            renderAddedImage(number);
+            console.log("renderAddedImage fertig");
             //console.log('div fehlt noch im dom ' + imageid);
             // This div does not exist so we need do add it do dom.
-            backgroundArea.innerHTML = backgroundArea.innerHTML + renderFromTemplate(number);
+            //renderFromTemplate(number);
+ //backgroundArea.innerHTML = backgroundArea.innerHTML + renderFromTemplate(number);
+            //container.innerHTML = container.innerHTML + renderFromTemplate(number);
+
+
             // add an obverser to be aple to update if imge is uloaded
             let imagefileNode = document.getElementById('fitem_id_unilabeltype_imageboard_image_' + (number));
+            console.log("renderAddedImage fertig");
             if (imagefileNode) {
                 let observer = new MutationObserver(refreshImage);
                 observer.observe(imagefileNode, {attributes: true, childList: true, subtree: true});
             }
-            refreshImage(number);
+            console.log("before refreshImage number");
+            ////refreshImage(number);
+            console.log("after refreshImage number");
         } else {
             //console.log('div existiert ' + number);
             // Div already exists so we need only to refresh the image because we only uploaded a new image
@@ -237,28 +262,63 @@ export const init = () => {
         }
     }
 
+
+    /**
+     *
+     * @param {number} number of
+     */
+    function renderAddedImage(number) {
+        console.log("renderAddedImage number", renderAddedImage, number);
+        const context = {
+            // Data to be rendered
+            number: number,
+            title: "hurzenschnurz"
+        };
+        //let backgroundArea = document.getElementById('unilabel-imageboard-background-area');
+        //backgroundArea.innerHTML = backgroundArea.innerHTML + renderFromTemplate(number);
+
+        Templates.renderForPromise('unilabeltype_imageboard/previewelement', context).then(({html, js}) => {
+            // We have to get the actual content, combine it with the rendered image and replace then the actual content.
+            let imageboardcontainer = document.getElementById('imageboardcontainer').innerHTML;
+            console.log("imagehtml", html);
+            console.log('imageboardcontainer', imageboardcontainer);
+            //let combiniert = containerinnerhtml + html + "x";
+            let combiniert = "<div>" + imageboardcontainer + "</div>" + html;
+            console.log("imagehtmlcombiniert", combiniert);
+            Templates.replaceNodeContents('#imageboardcontainer', combiniert, js);
+            console.log("replaceNodeContents fertig");
+            //return null;
+        }).catch(() => {
+            // No tiny editor present
+        });
+    }
+
+
+
+
     /**
      * Renders the div for the image in preview.
      *
      * @param {int} number
      * @returns {string}
      */
-    function renderFromTemplate(number) {
+ /*  function renderFromTemplate(number) {
         const imagedivashtml =
-            "<div id='unilabel_imageboard_imagediv_" + number + "' style='z-index: 5; position: absolute;'>" +
-            "<div id='imageidtitle_" + number + "' class='unilabel-imageboard-title' " +
-            " style='position: relative;'>Überschrift" +
+            "<div id='unilabel-imageboard-element-" + number + "' style='z-index: 5; position: absolute;'>" +
+            "<div id='id_elementtitle-" + number + "' class='unilabel-imageboard-title' " +
+            " style='position: relative; height: 50px;'>Überschrift" +
             "</div>" +
-            "<div id='imageidimage_" + number + "'>" +
-            "<img draggable='true' class='image' src='' id='unilabel-imageboard-imageid_" +
+            "<div id='imageidimage-" + number + "'>" +
+            "<img draggable='true' class='image' src='' id='unilabel-imageboard-imageid-" +
             number + "' style='position: relative; background-color: #f00;'>" +
             "</div>" +
             "</div>";
         return imagedivashtml;
     }
+*/
 
     /**
-     * If an image was uploaded or inputfields in the form changed then we need to refrech
+     * If an image was uploaded or inputfields in the form changed then we need to refresh
      * this image.
      * @param {int} number
      */
@@ -268,12 +328,12 @@ export const init = () => {
         // For now if it is a number the normal refresh can be used and only ONE image will be refreshed.
         // In the else code ther will be a refresh of ALL images until I can refactor this.
         if (!Array.isArray(number)) {
-            let imageid = document.getElementById('unilabel-imageboard-imageid_' + number);
+            let imageid = document.getElementById('unilabel-imageboard-imageid-' + number);
             // Werte für das image setzen
             let imagedata = getAllImagedataFromForm(number);
             imageid.style.background = imagedata['titlebackgroundcolor'];
             imageid.src = imagedata['src'];
-            const imagediv = document.getElementById('unilabel_imageboard_imagediv_' + number);
+            const imagediv = document.getElementById('unilabel-imageboard-element-' + number);
             imagediv.style.left = parseInt(imagedata['xposition']) + "px";
             imagediv.style.top = parseInt(imagedata['yposition']) + "px";
 
@@ -302,11 +362,11 @@ export const init = () => {
 
             // ToDo: add title if not empty
             let title = imagedata['title'];
-            const imageidtitle = document.getElementById('imageidtitle_' + number);
-            imageidtitle.innerHTML = title;
-            imageidtitle.style.color = imagedata['titlecolor'];
-            imageidtitle.style.backgroundColor = imagedata['titlebackgroundcolor'];
-            imageidtitle.style.fontSize = imagedata['fontsize'] + "px";
+            const elementtitle = document.getElementById('id_elementtitle-' + number);
+            elementtitle.innerHTML = title;
+            elementtitle.style.color = imagedata['titlecolor'];
+            elementtitle.style.backgroundColor = imagedata['titlebackgroundcolor'];
+            elementtitle.style.fontSize = imagedata['fontsize'] + "px";
         } else {
             //console.log("number ist ein array" , number);
             //console.log("number[0] ist ein array" , number[0]);
