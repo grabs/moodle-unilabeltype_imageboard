@@ -30,8 +30,14 @@
 .unilabel-imageboard-title,
 .unilabel-imageboard-image {
     cursor: move;
+}
+.unilabel-imageboard-title {
+    z-index: 11;
+}
+.unilabel-imageboard-image {
     z-index: 10;
 }
+
 .unilabel-imageboard-title {
     border-radius: 10px;
 }
