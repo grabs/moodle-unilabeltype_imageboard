@@ -41,7 +41,7 @@ export const init = () => {
     }
 
     /**
-     * ToDo: height auto needs different code
+     *
      * @param {event} event
      */
     function dragStart(event) {
@@ -51,6 +51,7 @@ export const init = () => {
             selectedImage.titlecorrector = 0;
         } else {
             console.log("dragStart title ausgewählt");
+            // ToDo: DragAndDrop of title
             selectedImage.titlecorrector = 50;
         }
 
@@ -70,7 +71,6 @@ export const init = () => {
             selectedImage.itemToMove = document.getElementById('unilabel-imageboard-element-' + selectedImage.number);
             // layerX and layerY is the relative position of the mouseposition inside div
             // div is the image or the title so layer depends on this according to the complete element.
-            // ToDo: DragAndDrop of title
             selectedImage.eventlayerX = event.layerX;
             selectedImage.eventlayerY = event.layerY;
         }
@@ -81,20 +81,14 @@ export const init = () => {
      * @param {event} event
      */
     function dragEnd(event) {
-        console.log("dragEnd event", event);
-        console.log("dragEnd event.target", event.target);
-        console.log("dragEnd event.offsetX", event.offsetX);
-        console.log("");
-        console.log("");
-
         if (selectedImage.number !== null ) {
             var xposition = calculateXposition(event);
             console.log("xposition", xposition);
             var yposition = calculateYposition(event);
             console.log("yposition", yposition);
             selectedImage.itemToMove.style.left = xposition + "px";
+            // ToDo: selectedImage.titlecorrector if title is selected.
             selectedImage.itemToMove.style.top = yposition + selectedImage.titlecorrector + "px";
-            console.log("qqqqqqqqqqqqq", selectedImage.itemToMove.style.top);
 
             // Change the inputfield
             const inputPositionX = document.getElementById('id_unilabeltype_imageboard_xposition_' + (selectedImage.number));
@@ -165,16 +159,6 @@ export const init = () => {
 
         var canvasboundings = canvas.getBoundingClientRect();
         console.log("canvasboundings", canvasboundings);
-
-
-        var dummy = event.dataTransfer;
-        console.log(" event.dataTransfer", dummy);
-
-        console.log("event.clientX", event.clientX);
-        console.log("canvasboundings.left", canvasboundings.left);
-        console.log("selectedImage.eventlayerX", selectedImage.eventlayerX);
-
-        //var xposition = event.clientX - canvasboundings.left - selectedImage.eventlayerX - 1;
         var xposition = event.clientX - canvasboundings.left - selectedImage.eventlayerX - 1;
 
         if (xposition < 0) {

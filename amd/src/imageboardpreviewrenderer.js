@@ -19,8 +19,11 @@ export const init = () => {
     setTimeout(refreshAllImages, 1000);
 
     setTimeout(function() {
-     //   grid(600, 400);
-    }, 500);
+        let canvaswidth = 800;
+        let canvasheight = 400;
+        let gridcolor = "#f00";
+        renderHelpergrid(canvaswidth, canvasheight, gridcolor);
+    }, 1000);
 
     /**
      *
@@ -82,35 +85,6 @@ export const init = () => {
     }
 
     /**
-     *
-     * @param {number} canvaswidth
-     * @param {number} canvasheight
-     */
-  /*  function grid(canvaswidth, canvasheight) {
-        // Create a 50x50px helpergrid if $capababilityforgrid.
-        let helpergrids = {};
-        for (let y = 0; y < canvasheight; y = y + 50) {
-            for (let x = 0; x < canvaswidth; x = x + 50) {
-                helpergrid = [];
-                helpergrid['x'] = x;
-                helpergrid['y'] = y;
-                helpergrids = helpergrid;
-            }
-        }
-    }*/
-
-    /**
-     *
-     * @param {event} event
-     */
-    /*
-    function machwas(event) {
-        log.debug("Bild hochgeladen");
-        log.debug(event);
-    }
-    */
-
-    /**
      * Register eventlistener to the all input fields of the form to register
      * focus-out events from input fields in order to trigger a fresh of the preview.
      */
@@ -156,6 +130,7 @@ export const init = () => {
         let filemanagerbackgroundimagefieldset = document.getElementById('id_unilabeltype_imageboard_backgroundimage_fieldset');
         let previewimage = filemanagerbackgroundimagefieldset.getElementsByClassName('realpreview');
         let backgrounddiv = document.getElementById('unilabel-imageboard-background-canvas');
+
         if (previewimage.length > 0) {
             let backgroundurl = previewimage[0].getAttribute('src').split('?')[0];
             // If the uploaded file reuses the filename of a previously uploaded image, they differ
@@ -193,6 +168,58 @@ export const init = () => {
         }
     }
 
+
+    /**
+     *
+     * @param {number} canvaswidth
+     * @param {number} canvasheight
+     */
+    function renderHelpergrid(canvaswidth, canvasheight) {
+        console.log("renderHelpergrid canvaswidth, canvasheight", canvaswidth, canvasheight);
+        let helpergrids = [];
+        for (let y = 0; y < canvasheight; y = y + 50) {
+            for (let x = 0; x < canvaswidth; x = x + 50) {
+                let helpergrid = {};
+                helpergrid['x'] = x;
+                helpergrid['y'] = y;
+                helpergrids.push(helpergrid);
+            }
+        }
+        const context = {
+            // Data to be rendered
+            helpergrids: helpergrids,
+            gridcolor: "#f00",
+            cmid: 12345,
+            hidden: 0
+        };
+
+        Templates.renderForPromise('unilabeltype_imageboard/imageboard_helpergridpreview', context).then(({html, js}) => {
+            // We have to get the actual content, combine it with the rendered image and replace then the actual content.
+            let imageboardcontainer = document.getElementById('imageboardcontainer').innerHTML;
+            let combined = "<div>" + imageboardcontainer + "</div>" + html;
+            Templates.replaceNodeContents('#imageboardcontainer', combined, js);
+            //return null;
+        }).catch(() => {
+            console.error('Rendering failed');
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * Gets the number of ALL elements in the form and then adds a div for each element to the dom if not already exists.
      * We need a timeout
@@ -227,7 +254,7 @@ export const init = () => {
     function addImageToDom(number) {
         const imageid = document.getElementById('unilabel-imageboard-imageid-' + number);
         if (imageid === null) {
-            console.log("imageid ist null");
+            console.log("imageid ist null also Bild hinzufügen");
             renderAddedImage(number);
             // This div does not exist so we need do add it do dom.
             // Add an obverser to be able to update if image is uploaded.
